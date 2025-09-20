@@ -1,0 +1,37 @@
+{
+  "name": "currency-auth-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "dev": "nodemon --exec \"node -r dotenv/config\" server.js",
+    "start": "node -r dotenv/config server.js",
+    "start:prod": "NODE_ENV=production node -r dotenv/config server.js",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{js,mjs,json,md}\"",
+    "check:env": "node -e \"['FIREBASE_PROJECT_ID','FIREBASE_CLIENT_EMAIL','FIREBASE_PRIVATE_KEY','FIREBASE_API_KEY'].forEach(k=>{if(!process.env[k]){console.error('Missing '+k);process.exitCode=1}})\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.6.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.9.0",
+    "nodemon": "^3.1.0",
+    "prettier": "^3.3.3"
+  },
+  "nodemonConfig": {
+    "env": {
+      "NODE_ENV": "development"
+    },
+    "ignore": ["node_modules/**", ".git/**"],
+    "ext": "js,mjs,json",
+    "watch": ["server.js", "src"]
+  }
+}
