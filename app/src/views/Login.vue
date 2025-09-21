@@ -8,18 +8,18 @@
           id="email" 
           type="email" 
           v-model="email" 
-          placeholder="Enter your email" 
+          placeholder="Digite seu email" 
           required
         />
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">Senha</label>
         <input 
           id="password" 
           type="password" 
           v-model="password" 
-          placeholder="Enter your password" 
+          placeholder="Digite sua senha" 
           required
         />
       </div>
@@ -27,7 +27,7 @@
       <button type="submit">Login</button>
     </form>
 
-    <button class="signup-btn" @click="goToSignup">Sign up</button>
+    <button class="signup-btn" @click="goToSignup">Criar conta</button>
 
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
   </div>
@@ -58,7 +58,7 @@ async function handleLogin() {
     })
 
     if (!response.ok) {
-      throw new Error("Invalid email or password")
+      throw new Error("Email ou senha inválidos")
     }
 
     const data = await response.json()
@@ -70,10 +70,10 @@ async function handleLogin() {
 
       router.push("/")
     } else {
-      errorMessage.value = data.message || "Login failed"
+      errorMessage.value = data.message || "Falha ao entrar"
     }
   } catch (err) {
-    errorMessage.value = err.message || "An error occurred"
+    errorMessage.value = err.message || "Ocorreu um erro"
   }
 }
 

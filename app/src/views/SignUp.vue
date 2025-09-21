@@ -1,6 +1,6 @@
 <template>
   <div class="signup-container">
-    <h2>Sign up</h2>
+    <h2>Criar conta</h2>
 
     <form @submit.prevent="handleSignup">
       <div class="form-group">
@@ -9,28 +9,28 @@
           id="email"
           type="email"
           v-model="email"
-          placeholder="Enter your email"
+          placeholder="Digite seu email"
           required
         />
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">Senha</label>
         <input 
           id="password"
           type="password"
           v-model="password"
-          placeholder="Enter your password"
+          placeholder="Digite sua senha"
           required
         />
       </div>
 
       <button type="submit" :disabled="loading">
-        {{ loading ? 'creating account...' : 'Create account' }}
+        {{ loading ? 'criando conta...' : 'Criar conta' }}
       </button>
     </form>
 
-    <button class="login-btn" @click="goToLogin">Back to login</button>
+    <button class="login-btn" @click="goToLogin">Voltar para login</button>
 
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
   </div>
@@ -64,7 +64,7 @@ async function handleSignup() {
 
     const data = await response.json()
     if (!response.ok) {
-      throw new Error(data?.error || "Signup failed")
+      throw new Error(data?.error || "Falha ao criar conta")
     }
 
     if (data.idToken) {
@@ -72,10 +72,10 @@ async function handleSignup() {
       localStorage.setItem("refreshToken", data.refreshToken || "")
       router.push("/")
     } else {
-      throw new Error("Signup succeeded but token was not provided")
+      throw new Error("Conta criada, mas o token não foi retornado")
     }
   } catch (err) {
-    errorMessage.value = err.message || "An error occurred"
+    errorMessage.value = err.message || "Ocorreu um erro"
   } finally {
     loading.value = false
   }

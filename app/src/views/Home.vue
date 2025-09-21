@@ -68,7 +68,9 @@
           {{ loading ? 'convertendo...' : 'converter' }}
         </button>
 
-        <a href="/login" class="logout">Sair</a>
+        <button type="button" class="logout text-btn" @click="logout">
+          Sair
+        </button>
 
         <p v-if="error" class="error">{{ error }}</p>
       </form>
@@ -78,8 +80,26 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const BASE = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/+$/, '')
+
+function getToken() {
+  return localStorage.getItem('idToken') || ''
+}
+
+async function authFetch(url, options = {}) {
+  const headers = new Headers(options.headers || {})
+  const token = getToken()
+  if (token) headers.set('Authorization', `Bearer ${token}`)
+  return fetch(url, { ...options, headers })
+}
+
+function logout() {
+  localStorage.removeItem('idToken')
+  localStorage.removeItem('refreshToken')
+  router.push('/login')
+}
 
 const currencies = ref([])
 const currenciesLoading = ref(false)
@@ -127,7 +147,7 @@ async function loadCurrencies() {
   currenciesLoading.value = true
   error.value = ''
   try {
-    const res = await fetch(`${BASE}/getCurrencyInfo`, { method: 'GET' })
+    const res = await authFetch(`${BASE}/getCurrencyInfo`, { method: 'GET' })
     if (!res.ok) throw new Error('Falha ao carregar as moedas')
     const data = await res.json()
     currencies.value = normalizeCurrencies(data)
@@ -155,17 +175,14 @@ async function fetchRate() {
 
   const params = new URLSearchParams({ valor: '1', de: moedaDe.value, para: moedaPara.value })
   try {
-    const res = await fetch(`${BASE}/converterMoeda?${params.toString()}`, { method: 'GET' })
+    const res = await authFetch(`${BASE}/converterMoeda?${params.toString()}`, { method: 'GET' })
     if (!res.ok) throw new Error('Erro ao obter taxa')
     const data = await res.json()
 
-    if (typeof data.taxa === 'number') taxa.value = data.taxa
-    else if (typeof data.rate === 'number') taxa.value = data.rate
-    else if (typeof data.valorConvertido === 'number') taxa.value = data.valorConvertido // 1 unit
-    else throw new Error('Resposta sem taxa')
+    if (typeof data.taxa !== 'number') throw new Error('Resposta inválida')
+    taxa.value = data.taxa
   } catch (e) {
-    console.log(e)
-    error.value = 'Erro inesperado ao obter taxa'
+    error.value = 'Erro ao obter taxa'
   }
 }
 
@@ -184,29 +201,17 @@ async function convertNow() {
       de: moedaDe.value,
       para: moedaPara.value
     })
-    const res = await fetch(`${BASE}/converterMoeda?${params.toString()}`, { method: 'GET' })
+    const res = await authFetch(`${BASE}/converterMoeda?${params.toString()}`, { method: 'GET' })
     if (!res.ok) throw new Error('Falha na conversão')
 
     const data = await res.json()
 
-    if (typeof data.valorConvertido === 'number') {
-      convertido.value = data.valorConvertido
-    } else if (typeof data.result === 'number') {
-      convertido.value = data.result
-    } else if (typeof data.amount === 'number') {
-      convertido.value = data.amount
-    } else if (typeof data.value === 'number') {
-      convertido.value = data.value
-    } else {
-      const rate =
-        typeof data.taxa === 'number' ? data.taxa :
-        typeof data.rate === 'number' ? data.rate : taxa.value
-      if (typeof rate !== 'number') throw new Error('Sem dados de conversão')
-      convertido.value = Number(valor.value) * rate
+    if (typeof data.valorConvertido !== 'number' || typeof data.taxa !== 'number') {
+      throw new Error('Resposta inválida')
     }
 
-    if (typeof data.taxa === 'number') taxa.value = data.taxa
-    if (typeof data.rate === 'number') taxa.value = data.rate
+    convertido.value = data.valorConvertido
+    taxa.value = data.taxa
   } catch (e) {
     error.value = 'Erro inesperado na conversão'
   } finally {
@@ -261,7 +266,6 @@ h2 {
 
 .input,
 .select {
-  width: 100%;
   padding: 0.65rem;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -291,7 +295,7 @@ h2 {
   font-weight: 600;
 }
 
-.btn {
+button {
   width: 100%;
   padding: 0.8rem;
   background: #e5bf60;
@@ -301,19 +305,18 @@ h2 {
   text-transform: lowercase;
 }
 
-.btn:disabled {
+button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.logout {
-  display: inline-block;
-  text-align: center;
-  width: 100%;
-  margin-top: 0.75rem;
+button.text-btn {
+  margin-top: 1rem;
+  background: none;
+  border: unset;
   text-decoration: underline;
-  color: #111;
 }
+
 
 .error {
   margin-top: 0.75rem;

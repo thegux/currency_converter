@@ -11,6 +11,7 @@
     "start": "node -r dotenv/config server.js",
     "start:prod": "NODE_ENV=production node -r dotenv/config server.js",
     "lint": "eslint .",
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest",
     "format": "prettier --write \"**/*.{js,mjs,json,md}\"",
     "check:env": "node -e \"['FIREBASE_PROJECT_ID','FIREBASE_CLIENT_EMAIL','FIREBASE_PRIVATE_KEY','FIREBASE_API_KEY'].forEach(k=>{if(!process.env[k]){console.error('Missing '+k);process.exitCode=1}})\""
   },
@@ -23,15 +24,23 @@
   },
   "devDependencies": {
     "eslint": "^9.9.0",
+    "jest": "^30.1.3",
     "nodemon": "^3.1.0",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "supertest": "^7.1.4"
   },
   "nodemonConfig": {
     "env": {
       "NODE_ENV": "development"
     },
-    "ignore": ["node_modules/**", ".git/**"],
+    "ignore": [
+      "node_modules/**",
+      ".git/**"
+    ],
     "ext": "js,mjs,json",
-    "watch": ["server.js", "src"]
+    "watch": [
+      "server.js",
+      "src"
+    ]
   }
 }
