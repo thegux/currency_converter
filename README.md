@@ -102,6 +102,8 @@ Os testes foram escritos com **Jest** e **Supertest**.
 
 Cada teste cobre cenários positivos e negativos para garantir que o sistema funcione corretamente e que erros sejam tratados.
 
+![Resultados dos Testes](./ResultadosTestes.png)
+
 ---
 
 ## Design inicial
